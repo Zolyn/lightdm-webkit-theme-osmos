@@ -12,7 +12,13 @@ yay -S lightdm-webkit-theme-osmos
 
 ### Manual installation
 
-Or set `greeter-session=lightdm-webkit2-greeter` in `/etc/lightdm/lightdm.conf`, then edit `/etc/lightdm/lightdm-webkit2-greeter.conf` to set `webkit_theme=lightdm-webkit-theme-osmos`.
+* Download the actual [tar.gz file](https://github.com/Warinyourself/lightdm-webkit-theme-osmos/releases/).
+* Unzip the tar.gz file to the */usr/share/lightdm-webkit/themes/osmos* folder.
+* Edit `/etc/lightdm/lightdm-webkit2-greeter.conf` and set `theme` to `osmos`.
+
+```sed -i 's/^\(#\?greeter\)-session\s*=\s*\(.*\)/greeter-session = lightdm-webkit2-greeter/g' /etc/lightdm/lightdm.conf```
+
+```sed -i 's/^webkit_theme\s*=\s*\(.*\)/webkit_theme = osmos/g' /etc/lightdm/lightdm-webkit2-greeter.conf```
 
 ## Themes
 ### [Random](https://warinyourself.github.io/lightdm-webkit-theme-osmos/?pxratio=0.8&animation-speed=5&symmetry=0.01&thickness=0.1&hue=360&brightness=1&invert=false&blur=false&no-transition=false&show-framerate=false&only-ui=true&themeName=Random)
