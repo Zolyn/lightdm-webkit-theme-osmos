@@ -1,15 +1,8 @@
+import { Greeter } from 'nody-greeter-types'
+
 /* eslint-disable @typescript-eslint/camelcase */
 export interface ExpandedWindow {
-  lightdm: Lightdm;
-  authentication_complete(): void;
-  lightdmLogin(
-    username: string,
-    password: string,
-    callback: () => void,
-  ): void;
-  lightdmStart(desktop: string): void;
-  show_prompt(text: string, type?: any): void;
-  show_message(text: string, type: any): void;
+  lightdm: Greeter;
 }
 
 export interface Lightdm {

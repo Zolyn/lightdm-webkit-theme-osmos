@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import '@/utils/lightdm'
 import App from './App'
 import router from './router'
 import store from './store'

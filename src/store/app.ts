@@ -53,6 +53,9 @@ class App extends VuexModule implements AppState {
     'only-ui': false
   }
 
+  inputErrorTimer: NodeJS.Timeout | null = null
+  showErrorStyle = false
+
   // TODO: replace this on localStorageSettings
   get getMainSettings(): AppSettings {
     const {
@@ -182,13 +185,6 @@ class App extends VuexModule implements AppState {
   }
 
   @Action
-  login() {
-    appWindow.lightdmLogin(this.username, this.password, () => {
-      appWindow.lightdmStart(this.currentDesktop?.key || appWindow?.lightdm?.sessions[0].key || 'i3')
-    })
-  }
-
-  @Action
   changeSettingsThemeInput({ key, value }: { key: string; value: AppInputThemeValue }) {
     const inputs = (this.activeTheme as AppTheme).settings || []
     const input = inputs?.find(input => input.name === key)
@@ -301,6 +297,33 @@ class App extends VuexModule implements AppState {
   }
 
   @Action
+  startAuthentication(): void {
+    appWindow.lightdm.authenticate(null)
+  }
+
+  @Action
+  authenticationDone(): void {
+    appWindow.lightdm.start_session(this.currentDesktop?.key || appWindow.lightdm.sessions[0].key || 'i3')
+  }
+
+  @Action
+  authenticationFailed(): void {
+    appWindow.lightdm.cancel_authentication()
+
+    if (this.inputErrorTimer) {
+      clearTimeout(this.inputErrorTimer)
+    }
+
+    this.SET_STATE_APP({ key: 'showErrorStyle', value: true })
+
+    const timer = setTimeout(() => {
+      this.SET_STATE_APP({ key: 'showErrorStyle', value: false })
+    }, 3000)
+
+    this.SET_STATE_APP({ key: 'inputErrorTimer', value: timer })
+  }
+
+  @Action
   setUpSettings() {
     const { app: { $route } } = router
     const { query } = $route
@@ -333,6 +356,42 @@ class App extends VuexModule implements AppState {
     } catch (error) {
       this.setUpSettings()
     }
+  }
+
+  @Action
+  setPromptHandler(): void {
+    appWindow.lightdm.show_prompt.connect((_msg, type) => {
+      if (type === 0) {
+        console.log(`Respond username: '${this.username}'`)
+        appWindow.lightdm.respond(this.username)
+      } else if (type === 1 && appWindow.lightdm.in_authentication) {
+        console.log(`Respond password: '${this.password}'`)
+
+        appWindow.lightdm.respond(this.password)
+      } else {
+        console.log('Respond nothing')
+      }
+    })
+  }
+
+  @Action
+  setAuthenticationHandler(): void {
+    appWindow.lightdm.authentication_complete.connect(() => {
+      if (appWindow.lightdm.is_authenticated) {
+        console.log('Authentication done')
+        this.authenticationDone()
+      } else {
+        console.log('Authentication failed')
+        this.authenticationFailed()
+      }
+    })
+  }
+
+  @Action
+  init() {
+    this.setUpSettings()
+    this.setPromptHandler()
+    this.setAuthenticationHandler()
   }
 }
 

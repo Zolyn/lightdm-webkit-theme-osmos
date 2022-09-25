@@ -22,8 +22,18 @@ export default class UserInput extends Vue {
     return AppModule.showPassword
   }
 
+  get classList() {
+    const base = ['mousetrap']
+
+    if (AppModule.showErrorStyle) {
+      base.push('password-input--error')
+    }
+
+    return base
+  }
+
   login() {
-    AppModule.login()
+    AppModule.startAuthentication()
   }
 
   handleKeyup(event: InputEvent) {
@@ -48,7 +58,7 @@ export default class UserInput extends Vue {
         autocomplete='on'
         autofocus
         ref='password'
-        class='mousetrap'
+        class={this.classList}
         placeholder={ this.$t('text.password') }
         onKeyup={this.handleKeyup}
         value={this.passwordValue}

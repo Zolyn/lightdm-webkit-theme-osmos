@@ -22,7 +22,7 @@ export default class MainApp extends Vue {
   }
 
   created() {
-    AppModule.setUpSettings()
+    AppModule.init()
     this.initKeybinds()
   }
 
@@ -48,7 +48,7 @@ export default class MainApp extends Vue {
       const isFocusPassword = document.querySelector('#password:focus')
 
       if (isFocusPassword) {
-        AppModule.login()
+        AppModule.startAuthentication()
       } else {
         focusInputPassword()
       }
